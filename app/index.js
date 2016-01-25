@@ -79,7 +79,7 @@ module.exports = yo.Base.extend({
   templates: function() {
     var context = {
       name: {
-        kebab: this.options.name,
+        kebab: _.kebabCase(this.options.name),
         constant: _.upperFirst(_.camelCase(this.options.name)),
       },
       description: this.options.description,
