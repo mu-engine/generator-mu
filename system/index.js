@@ -6,7 +6,12 @@ module.exports = yo.Base.extend({
     yo.Base.apply(this, arguments);
 
     this.option("name", {
-      desc: "State name. Expects kebab case.",
+      desc: "System name. Expects kebab case.",
+      type: String,
+    });
+
+    this.option("filters", {
+      desc: "Comma seperated list of filters, Expects camel case.",
       type: String,
     });
   },
@@ -19,10 +24,15 @@ module.exports = yo.Base.extend({
           kebab: _.kebabCase(this.options.name),
           constant: _.upperFirst(_.camelCase(this.options.name)),
         },
+        filters: (this.options.filters || "").trim().split(",").filter(function(e) {
+          return !_.isEmpty(e.trim());
+        }).map(function(e) {
+          return "\"" + e + "\"";
+        }).join(", "),
       };
     }
 
-    this.template("_state.js", "src/states/" + context.name.kebab + "-state.js", context);
+    this.template("_system.js", "src/systems/" + context.name.kebab + "-system.js", context);
   },
 });
 
