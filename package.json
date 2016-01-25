@@ -1,0 +1,23 @@
+{
+  "name": "generator-mu",
+  "version": "0.1.0",
+  "description": "Generator for Mu Engine games.",
+  "main": "app/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mu-engine/generator-mu.git"
+  },
+  "keywords": [
+    "yeoman-generator"
+  ],
+  "author": "John J. Glynn IV",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mu-engine/generator-mu/issues"
+  },
+  "homepage": "https://github.com/mu-engine/generator-mu#readme",
+  "dependencies": {
+    "lodash": "^4.0.0",
+    "yeoman-generator": "^0.22.4"
+  }
+}
