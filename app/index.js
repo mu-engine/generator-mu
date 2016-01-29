@@ -40,7 +40,12 @@ module.exports = yo.Base.extend({
           bugs: {
             url: "https://github.com/" + username + "/" + this.options.name + "/issues"
           },
-          homepage: "https://github.com/" + username + "/" + this.options.name + "#readme"
+          homepage: "https://github.com/" + username + "/" + this.options.name + "#readme",
+          browserify: {
+            transform: [
+              "es6ify"
+            ]
+          },
         }, null, 2);
       }
 

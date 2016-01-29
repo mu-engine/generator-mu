@@ -37,7 +37,6 @@ gulp.task("build", function() {
     .pipe(inject(es.merge([
       browserify({ entries: "./src/index.js", debug: true })
         .add(es6ify.runtime)
-        .transform(es6ify)
         .bundle()
         .on("error", function(error) {
           console.error(error.message);
