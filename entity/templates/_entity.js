@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 
 <% for (i in components) { -%>
-import <%= components[i].constant %>Component from "./components/<%= components[i].kebab %>-component.js";
+import <%= components[i].constant %>Component from "../components/<%= components[i].kebab %>-component.js";
 <% } -%>
 
 export default Immutable.Record({

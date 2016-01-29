@@ -1,9 +1,8 @@
 {
   "name": "generator-mu",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Generator for Mu Engine games.",
-  "main": "app/index.js",
-  "repository": {
+  "main": "app/index.js", "repository": {
     "type": "git",
     "url": "git+https://github.com/mu-engine/generator-mu.git"
   },
