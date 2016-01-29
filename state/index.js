@@ -9,6 +9,10 @@ module.exports = yo.Base.extend({
       desc: "State name. Expects kebab case.",
       type: String,
     });
+    this.option("systems", {
+      desc: "Comma seperated list of systems. Expects camel case.",
+      type: String,
+    });
   },
   templates: function() {
     if (!_.isString(this.options.name) || _.isEmpty(this.options.name)) {
@@ -19,6 +23,14 @@ module.exports = yo.Base.extend({
           kebab: _.kebabCase(this.options.name),
           constant: _.upperFirst(_.camelCase(this.options.name)),
         },
+        systems: (this.options.systems || "").trim().split(",").filter(function(e) {
+          return !_.isEmpty(e.trim());
+        }).map(function(e) {
+          return {
+            constant: _.upperFirst(_.camelCase(e)),
+            kebab: _.kebabCase(e),
+          }
+        }),
       };
     }
 
