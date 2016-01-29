@@ -5,6 +5,7 @@ import <%= components[i].constant %>Component from "./components/<%= components[
 <% } -%>
 
 export default Immutable.Record({
+  meta: null,
 <% for (i in components) { -%>
   <%= components[i].camel %>: <%= components[i].constant %>Component({}),
 <% } -%>
