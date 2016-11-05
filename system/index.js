@@ -24,14 +24,15 @@ module.exports = yo.Base.extend({
           kebab: _.kebabCase(this.options.name),
           constant: _.upperFirst(_.camelCase(this.options.name)),
         },
-        filters: (this.options.filters || "").trim().split(",").filter(function(e) {
-          return !_.isEmpty(e.trim());
-        }).map(function(e) {
-          return "\"" + e + "\"";
-        }).join(", "),
+        filters: _.chain(this.options.filters || "")
+          .split(",")
+          .filter((e) => !_.isEmpty(e.trim()))
+          .map(function(e) {
+            return "\"" + e.trim() + "\"";
+          }).value().join(", "),
       };
     }
 
-    this.template("_system.js", "src/systems/" + context.name.kebab + "-system.js", context);
+    this.template("_system.ts", "src/systems/" + context.name.kebab + "-system.ts", context);
   },
 });

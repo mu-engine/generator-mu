@@ -23,18 +23,35 @@ module.exports = yo.Base.extend({
           kebab: _.kebabCase(this.options.name),
           constant: _.upperFirst(_.camelCase(this.options.name)),
         },
-        systems: (this.options.systems || "").trim().split(",").filter(function(e) {
-          return !_.isEmpty(e.trim());
-        }).map(function(e) {
-          return {
-            constant: _.upperFirst(_.camelCase(e)),
-            kebab: _.kebabCase(e),
-          }
-        }),
+        systems: _.chain(this.options.systems || "")
+          .split(",")
+          .filter((e) => !_.isEmpty(e.trim()))
+          .map((e) => {
+            let system = e.split("/", 2);
+
+            if (_.size(system) == 2) {
+              if (_.isEmpty(system[0].trim())) {
+                return {
+                  constant: _.upperFirst(_.camelCase(system[1].trim())),
+                  path: "mu-engine",
+                };
+              } else {
+                return {
+                  constant: _.upperFirst(_.camelCase(system[1].trim())),
+                  path: `${_.kebabCase(system[0].trim())}`,
+                };
+              }
+            } else {
+              return {
+                constant: _.upperFirst(_.camelCase(system[0].trim())),
+                path: `../systems/${_.kebabCase(system[0].trim())}-system`,
+              };
+            }
+          }).value(),
       };
     }
 
-    this.template("_state.js", "src/states/" + context.name.kebab + "-state.js", context);
+    this.template("_state.ts", "src/states/" + context.name.kebab + "-state.ts", context);
   },
 });
 

@@ -1,12 +1,10 @@
-import Immutable from "immutable";
-import Mu from "mu-engine";
-import <%= name.constant %> from "./<%= name.kebab %>";
+const express = require("express");
+const morgan = require("morgan");
+const serveStatic = require("serve-static");
 
-Mu.Ready().then(() => {
-  let canvas = document.getElementById("mu-canvas");
+const app = express();
 
-  Mu.Canvas(canvas, Mu.Canvas.Settings());
-  Mu.Input(canvas);
+app.use(morgan("dev"));
+app.use(serveStatic("public"));
 
-  Mu.Interval(<%= name.constant %>(), 30, Mu.runState);
-});
+app.listen(process.env.PORT || "8080");

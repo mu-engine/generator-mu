@@ -24,12 +24,20 @@ module.exports = yo.Base.extend({
           kebab: _.kebabCase(this.options.name),
           constant: _.upperFirst(_.camelCase(this.options.name)),
         },
-        fields: (this.options.fields || "").trim().split(",").filter(function(e) {
-          return !_.isEmpty(e.trim());
-        }),
+        fields: _.chain(this.options.fields || "")
+          .split(",")
+          .filter((e) => !_.isEmpty(e.trim()))
+          .map((e) => {
+            var pair = e.split("=", 2);
+            if (pair.length === 2) {
+              return { key: pair[0], value: pair[1] };
+            } else {
+              return { key: pair[0], value: "null" };
+            }
+          }).value(),
       };
     }
 
-    this.template("_component.js", "src/components/" + context.name.kebab + "-component.js", context);
+    this.template("_component.ts", "src/components/" + context.name.kebab + "-component.ts", context);
   },
 });

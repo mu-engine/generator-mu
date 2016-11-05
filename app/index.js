@@ -17,17 +17,23 @@ module.exports = yo.Base.extend({
       type: String,
       defaults: "A generated Mu Engine game.",
     });
+
   },
   packageFile: function() {
     var done = this.async();
 
     this.user.github.username(function(err, username) {
-      if (!err) {
+      if (err) {
+        done(err);
+      } else {
         this.fs.writeJSON("package.json", {
           name: this.options.name,
           version: "0.1.0",
           description: this.options.description,
-          main: "server.js",
+          main: "index.js",
+          scripts: {
+            start: "node index.js"
+          },
           repository: {
             type: "git",
             url: "git+https://github.com/" + username + "/" + this.options.name + ".git"
@@ -41,45 +47,11 @@ module.exports = yo.Base.extend({
             url: "https://github.com/" + username + "/" + this.options.name + "/issues"
           },
           homepage: "https://github.com/" + username + "/" + this.options.name + "#readme",
-          browserify: {
-            transform: [
-              "es6ify"
-            ]
-          },
         }, null, 2);
-      }
 
-      done(err);
+        done();
+      }
     }.bind(this));
-  },
-  dependencies: function() {
-    this.npmInstall([
-      "express",
-      "morgan",
-      "serve-static",
-    ], { save: true });
-    this.npmInstall([
-      "browserify",
-      "del",
-      "es6ify",
-      "event-stream",
-      "gulp",
-      "gulp-concat",
-      "gulp-cssmin",
-      "gulp-if",
-      "gulp-inject",
-      "gulp-nodemon",
-      "gulp-plumber",
-      "gulp-rename",
-      "gulp-sourcemaps",
-      "gulp-uglify",
-      "gulp-watch",
-      "immutable",
-      "lazypipe",
-      "mu-engine",
-      "vinyl-buffer",
-      "vinyl-source-stream",
-    ], { saveDev: true });
   },
   templates: function() {
     var context = {
@@ -92,12 +64,41 @@ module.exports = yo.Base.extend({
 
     this.template("_gitignore", ".gitignore", context);
     this.template("_README.md", "README.md", context);
-    this.template("_gulpfile.js", "gulpfile.js", context);
-    this.template("_server.js", "server.js", context);
-    this.template("_index.js", "src/index.js", context);
+    this.template("_tslint.json", "tslint.json", context);
+    this.template("_tsconfig.json", "tsconfig.json", context);
+    this.template("_webpack.config.js", "webpack.config.js", context);
+    this.template("_index.js", "index.js", context);
+    this.template("_index.ts", "src/index.ts", context);
     this.template("_index.html", "src/index.html", context);
-    this.template("_index.css", "src/index.css", context);
-    this.template("_game.js", "src/" + context.name.kebab + ".js", context);
-    this.template("_game-state.js", "src/states/" + context.name.kebab + "-state.js", context);
+    this.template("_index.scss", "src/index.scss", context);
+    this.template("_game.ts", "src/" + context.name.kebab + ".ts", context);
+  },
+  dependencies: function() {
+    this.on("end", () => {
+      this.spawnCommandSync("yarn",[
+        "add",
+        "immutable",
+        "mu-engine",
+      ]);
+
+      this.spawnCommandSync("yarn",[
+        "add",
+        "css-loader",
+        "express",
+        "extract-text-webpack-plugin",
+        "html-webpack-plugin",
+        "morgan",
+        "node-sass",
+        "sass-loader",
+        "serve-static",
+        "style-loader",
+        "ts-loader",
+        "tslint",
+        "tslint-loader",
+        "typescript",
+        "webpack",
+        "--dev",
+      ]);
+    });
   },
 });
