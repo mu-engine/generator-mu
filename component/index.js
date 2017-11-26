@@ -1,5 +1,5 @@
-var _ = require("lodash");
 var yo = require("yeoman-generator");
+var util = require("../util");
 
 module.exports = yo.Base.extend({
   constructor: function() {
@@ -16,33 +16,13 @@ module.exports = yo.Base.extend({
     });
   },
   templates: function() {
-    if (!_.isString(this.options.name) || _.isEmpty(this.options.name.trim())) {
-      throw new Error("Component name is required");
-    }
-
-    var name = this.options.name.trim();
-    var fields = _.chain(this.options.fields)
-      .split(",")
-      .filter(function(e) { return !_.isEmpty(e.trim()); })
-      .map(function(e) {
-        var pair = e.split("=", 2);
-        var lval = pair[0].split(":", 2);
-
-        return {
-          key: _.camelCase(lval[0]),
-          type: (lval[1] !== undefined ? lval[1] : "any"),
-          defaults: pair[1],
-        };
-      }).value();
-
     var context = {
-      name: {
-        kebab: _.kebabCase(name),
-        constant: _.upperFirst(_.camelCase(name)),
-      },
-      fields: fields,
+      name: util.nameFor(this.options.name),
+      fields: util.fieldsFor(this.options.fields),
     };
 
-    this.template("_template", "src/components/" + context.name.kebab + "-component.ts", context);
+    this.template("_component.ts",
+                  "src/components/" + context.name.kebab + "-component.ts",
+                  context);
   },
 });

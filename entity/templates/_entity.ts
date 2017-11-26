@@ -1,14 +1,35 @@
-import * as Immutable from "immutable";
-
-<% if (components.length > 0) { -%>
-<% for (c of components) { -%>
-import <%= c.constant %>Component from "<%= c.path %>";
+<% for (i in imports) { -%>
+<% if (imports[i].list.length > 1) { -%>
+import {
+<% for (j in imports[i].list) { -%>
+  <%= imports[i].list[j] %>
+<% } -%>
+} from "<%= imports[i].name %>";
+<% } else { -%>
+import { <%= imports[i].list[0] %> } from "<%= imports[i].name %>";
 <% } -%>
 
 <% } -%>
-export default Immutable.Record({
-  meta: null,
+export interface <%= name.constant %>EntityConfig extends <%= parent.constant%>EntityConfig {
 <% for (i in components) { -%>
-  <%= components[i].camel %>: new <%= components[i].constant %>Component({}),
+  <%= components[i].key %>: Partial<<%= components[i].constant %>Data>;
 <% } -%>
-}, "<%= name.constant %>Entity");
+}
+
+export class <%= name.constant %>Entity extends <%= parent.constant %>Entity {
+<% for (i in components) { -%>
+  <%= components[i].key %>: <%= components[i].constant %>Data;
+<% } -%>
+
+  constructor(config?: Partial<<%= name.constant %>EntityConfig>) {
+    super(config);
+<% for (i in components) { -%>
+
+    this.<%= components[i].key %> = <%= components[i].constant %>Component({});
+<% } -%>
+<% for (i in systems) { -%>
+
+    <%= systems[i].constant %>System(this);
+<% } -%>
+  }
+}

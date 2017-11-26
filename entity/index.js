@@ -1,12 +1,17 @@
-var _ = require("lodash");
 var yo = require("yeoman-generator");
+var util = require("../util");
 
 module.exports = yo.Base.extend({
   constructor: function() {
     yo.Base.apply(this, arguments);
 
     this.option("name", {
-      desc: "Component name. Expects kebab case.",
+      desc: "Entity name. Expects kebab case.",
+      type: String,
+    });
+
+    this.option("parent", {
+      desc: "Parent Entity name. Expects camel case.",
       type: String,
     });
 
@@ -14,47 +19,26 @@ module.exports = yo.Base.extend({
       desc: "Comma seperated list of components. Expects camel case.",
       type: String,
     });
+
+    this.option("systems", {
+      desc: "Comma seperated list of systems. Expects camel case.",
+      type: String,
+    });
   },
   templates: function() {
-    if (!_.isString(this.options.name) || _.isEmpty(this.options.name)) {
-      throw new Error("Entity name is required");
-    } else {
-      var context = {
-        name: {
-          kebab: _.kebabCase(this.options.name),
-          constant: _.upperFirst(_.camelCase(this.options.name)),
-        },
-        components: _.chain(this.options.components || "")
-          .split(",")
-          .filter((e) => !_.isEmpty(e.trim()))
-          .map((e) => {
-            let component = e.split("/", 2);
+    var name = util.nameFor(this.options.name);
+    var parent = util.parentFor(this.options.parent);
+    var components = util.componentsFor(this.options.components);
+    var systems = util.componentsFor(this.options.systems);
+    var imports = util.importsFor(components.concat(systems).concat([ parent ]));
 
-            if (_.size(component) == 2) {
-              if (_.isEmpty(component[0].trim())) {
-                return {
-                  constant: _.upperFirst(_.camelCase(component[1].trim())),
-                  path: "mu-engine",
-                  camel: _.camelCase(component[1].trim()),
-                };
-              } else {
-                return {
-                  constant: _.upperFirst(_.camelCase(component[1].trim())),
-                  path: `${_.kebabCase(component[0].trim())}`,
-                  camel: _.camelCase(component[1].trim()),
-                };
-              }
-            } else {
-              return {
-                constant: _.upperFirst(_.camelCase(component[0].trim())),
-                path: `../components/${_.kebabCase(component[0].trim())}-component`,
-                camel: _.camelCase(component[0].trim()),
-              };
-            }
-          }).value(),
-      };
-    }
-
-    this.template("_entity.ts", "src/entities/" + context.name.kebab + "-entity.ts", context);
+    this.template("_entity.ts",
+                  "src/entities/" + name.kebab + "-entity.ts", {
+      parent: parent,
+      name: name,
+      components: components,
+      systems: systems,
+      imports: imports,
+    });
   },
 });
