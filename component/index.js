@@ -16,28 +16,33 @@ module.exports = yo.Base.extend({
     });
   },
   templates: function() {
-    if (!_.isString(this.options.name) || _.isEmpty(this.options.name)) {
+    if (!_.isString(this.options.name) || _.isEmpty(this.options.name.trim())) {
       throw new Error("Component name is required");
-    } else {
-      var context = {
-        name: {
-          kebab: _.kebabCase(this.options.name),
-          constant: _.upperFirst(_.camelCase(this.options.name)),
-        },
-        fields: _.chain(this.options.fields || "")
-          .split(",")
-          .filter((e) => !_.isEmpty(e.trim()))
-          .map((e) => {
-            var pair = e.split("=", 2);
-            if (pair.length === 2) {
-              return { key: pair[0], value: pair[1] };
-            } else {
-              return { key: pair[0], value: "null" };
-            }
-          }).value(),
-      };
     }
 
-    this.template("_component.ts", "src/components/" + context.name.kebab + "-component.ts", context);
+    var name = this.options.name.trim();
+    var fields = _.chain(this.options.fields)
+      .split(",")
+      .filter(function(e) { return !_.isEmpty(e.trim()); })
+      .map(function(e) {
+        var pair = e.split("=", 2);
+        var lval = pair[0].split(":", 2);
+
+        return {
+          key: _.camelCase(lval[0]),
+          type: (lval[1] !== undefined ? lval[1] : "any"),
+          defaults: pair[1],
+        };
+      }).value();
+
+    var context = {
+      name: {
+        kebab: _.kebabCase(name),
+        constant: _.upperFirst(_.camelCase(name)),
+      },
+      fields: fields,
+    };
+
+    this.template("_template", "src/components/" + context.name.kebab + "-component.ts", context);
   },
 });
