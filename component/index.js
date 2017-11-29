@@ -1,9 +1,9 @@
-var yo = require("yeoman-generator");
+var Generator = require("yeoman-generator");
 var util = require("../util");
 
-module.exports = yo.Base.extend({
-  constructor: function() {
-    yo.Base.apply(this, arguments);
+module.exports = class ComponentGenerator extends Generator {
+  constructor(args, opts) {
+    super(args, opts)
 
     this.option("name", {
       desc: "Component name. Expects kebab case.",
@@ -13,16 +13,21 @@ module.exports = yo.Base.extend({
     this.option("fields", {
       desc: "Comma seperated list of fields. Expects camel case.",
       type: String,
+      default: "",
     });
-  },
-  templates: function() {
-    var context = {
-      name: util.nameFor(this.options.name),
-      fields: util.fieldsFor(this.options.fields),
-    };
+  }
 
-    this.template("_component.ts",
-                  "src/components/" + context.name.kebab + "-component.ts",
-                  context);
-  },
-});
+  templates() {
+    var name = util.nameFor(this.options.name);
+    var fields = util.fieldsFor(this.options.fields);
+    var imports = util.importsFor(fields);
+
+    this.fs.copyTpl(
+      this.templatePath("_component.ts"),
+      this.destinationPath("src/components/" + name.kebab + "-component.ts"),
+      { name: name,
+        fields: fields,
+        imports: imports,
+      });
+  }
+}

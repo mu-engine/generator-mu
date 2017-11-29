@@ -1,9 +1,9 @@
-var yo = require("yeoman-generator");
+var Generator = require("yeoman-generator");
 var util = require("../util");
 
-module.exports = yo.Base.extend({
-  constructor: function() {
-    yo.Base.apply(this, arguments);
+module.exports = class EntityGenerator extends Generator {
+  constructor(args, opts) {
+    super(args, opts)
 
     this.option("name", {
       desc: "Entity name. Expects kebab case.",
@@ -13,32 +13,37 @@ module.exports = yo.Base.extend({
     this.option("parent", {
       desc: "Parent Entity name. Expects camel case.",
       type: String,
+      default: "base",
     });
 
     this.option("components", {
       desc: "Comma seperated list of components. Expects camel case.",
       type: String,
+      default: "",
     });
 
     this.option("systems", {
       desc: "Comma seperated list of systems. Expects camel case.",
       type: String,
+      default: "",
     });
-  },
-  templates: function() {
+  }
+
+  templates() {
     var name = util.nameFor(this.options.name);
     var parent = util.parentFor(this.options.parent);
     var components = util.componentsFor(this.options.components);
-    var systems = util.componentsFor(this.options.systems);
+    var systems = util.systemsFor(this.options.systems);
     var imports = util.importsFor(components.concat(systems).concat([ parent ]));
 
-    this.template("_entity.ts",
-                  "src/entities/" + name.kebab + "-entity.ts", {
-      parent: parent,
-      name: name,
-      components: components,
-      systems: systems,
-      imports: imports,
-    });
-  },
-});
+    this.fs.copyTpl(
+      this.templatePath("_entity.ts"),
+      this.destinationPath("src/entities/" + name.kebab + "-entity.ts"),
+      { parent: parent,
+        name: name,
+        components: components,
+        systems: systems,
+        imports: imports,
+      });
+  }
+}
