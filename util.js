@@ -11,44 +11,130 @@ exports.nameFor = function(s) {
   };
 }
 
+// key[:type[@module]][=value]
+exports.splitField = function(s) {
+  var pair = s.split("=", 2);
+
+  if (pair.length > 1) {
+    return exports.splitComponent(pair[0]).concat([ pair[1] ]);
+  } else {
+    return exports.splitComponent(pair[0]).concat([ "" ]);
+  }
+}
+
+// key[:type[@module]]
+exports.splitComponent = function(s) {
+  var pair = s.split(":", 2);
+
+  return [ _.camelCase(pair[0]) ].concat(exports.splitTypeinfo(pair[1]));
+}
+
+// type[@module]
+exports.splitTypeinfo = function(s) {
+  if (s !== undefined) {
+    var pair = s.split("@", 2);
+    var type = _.upperFirst(_.camelCase(pair[0].trim()));
+
+    if (pair.length > 1) {
+      return [ type, pair[1].trim() ];
+    } else if ([ "string", "number", "boolean", "date" ].includes(pair[0].trim())) {
+      return [ type, "" ];
+    } else {
+      return [ type, "mu-engine" ];
+    }
+  } else {
+    return [ "any", "" ];
+  }
+}
+
 exports.fieldsFor = function(s) {
-  return _.chain(s || "")
+  return _.chain(s)
     .split(",")
     .filter(function(e) { return !_.isEmpty(e.trim()); })
     .map(function(e) {
-      var pair = e.split("=", 2);
-      var lval = pair[0].split(":", 2);
+      var field = exports.splitField(e);
 
       return {
-        key: _.camelCase(lval[0]),
-        type: (lval[1] !== undefined ? lval[1] : "any"),
-        defaults: pair[1],
+        key: field[0],
+        type: field[1],
+        module: field[2],
+        imports: [ field[1] ],
+        defaults: field[3],
       };
     }).value();
 }
 
-exports.modulesFor = function(s) {
-  return _.chain((s || "").trim())
+exports.eventsFor = function(s) {
+  return _.chain(s)
     .split(",")
     .filter(function(e) { return !_.isEmpty(e.trim()); })
     .map(function(e) {
-      var pair = e.split(":", 2);
+      var component = exports.splitComponent(e);
 
-      if (pair.length > 1) {
-        return {
-          key: _.camelCase(pair[1].trim()),
-          constant: _.upperFirst(_.camelCase(pair[1].trim())),
-          module: (pair[0].trim() === "." ?
-                   pair[0].trim() : _.kebabCase(pair[0].trim())),
-        };
-      } else {
-        return {
-          key: _.camelCase(pair[0].trim()),
-          constant: _.upperFirst(_.camelCase(pair[0].trim())),
-          module: "mu-engine",
-        };
-      }
+      return {
+        key: _.kebabCase(component[0]),
+        type: (component[1] === "any" ? "" : component[1] ),
+        module: (component[2] === "." ?
+                ("../events/" + _.kebabCase(component[1]) + "-event") :
+                component[2]),
+        imports: [ (component[1] + "Event"), (component[1] + "EventData") ],
+      };
     }).value();
+}
+
+exports.componentsFor = function(s) {
+  return _.chain(s)
+    .split(",")
+    .filter(function(e) { return !_.isEmpty(e.trim()); })
+    .map(function(e) {
+      var typeinfo = exports.splitTypeinfo(e);
+
+      return {
+        key: _.kebabCase(typeinfo[0]),
+        type: typeinfo[0],
+        module: (typeinfo[1] === "." ?
+                ("../components/" + _.kebabCase(typeinfo[0]) + "-component") :
+                typeinfo[1]),
+        imports: [ (typeinfo[0] + "Data"), (typeinfo[0] + "Component") ],
+      };
+    }).value();
+}
+
+exports.systemsFor = function(s) {
+  return _.chain(s)
+    .split(",")
+    .filter(function(e) { return !_.isEmpty(e.trim()); })
+    .map(function(e) {
+      var typeinfo = exports.splitTypeinfo(e);
+
+      return {
+        type: typeinfo[0],
+        module: (typeinfo[1] === "." ?
+                ("../systems/" + _.kebabCase(typeinfo[0]) + "-system") :
+                typeinfo[1]),
+        imports: [ (typeinfo[0] + "System") ],
+      };
+    }).value();
+}
+
+exports.parentFor = function(s) {
+  if (!_.isString(s) || _.isEmpty(s.trim())) {
+    return {
+      type: "",
+      module: "mu-engine",
+      imports: [ "Entity" ],
+    };
+  } else {
+    var typeinfo = exports.splitTypeinfo(s);
+
+    return {
+      type: typeinfo[0],
+      module: (typeinfo[1] === "." ?
+              ("../entities/" + _.kebabCase(typeinfo[0]) + "-entity") :
+              typeinfo[1]),
+      imports: [ (typeinfo[0] + "Entity"), (typeinfo[0] + "EntityConfig") ],
+    };
+  }
 }
 
 exports.importsFor = function(a) {
@@ -59,40 +145,8 @@ exports.importsFor = function(a) {
         name: k,
         list: _.uniq(_.flatten(_.map(v, "imports"))),
       };
+    }).filter(function(e) {
+      return !_.isEmpty(e.name.trim());
     }).value();
-}
-
-exports.componentsFor = function(s) {
-  return _.forEach(exports.modulesFor(s), function(e) {
-    e.imports = [ (e.constant + "Data"), (e.constant + "Component") ];
-
-    if (e.module === ".") {
-      e.module = "../components/" + _.kebabCase(e.key) + "-component";
-    }
-  });
-}
-
-exports.systemsFor = function(s) {
-  return _.forEach(exports.modulesFor(s), function(e) {
-    e.imports = [ (e.constant + "System") ];
-
-    if (e.module === ".") {
-      e.module = "../systems/" + _.kebabCase(e.key) + "-system";
-    }
-  });
-}
-
-exports.parentFor = function(s) {
-  if (!_.isString(s) || _.isEmpty(s.trim())) {
-    s = "base";
-  }
-
-  return _.first(_.forEach(exports.modulesFor(s), function(e) {
-    e.imports = [ (e.constant + "Entity") ];
-
-    if (e.module === ".") {
-      e.module = "../entities/" + _.kebabCase(e.key) + "-entity";
-    }
-  }));
 }
 

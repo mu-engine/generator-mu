@@ -1,38 +1,62 @@
-var _ = require("lodash");
-var yo = require("yeoman-generator");
+var Generator = require("yeoman-generator");
+var util = require("../util");
 
-module.exports = yo.Base.extend({
-  constructor: function() {
-    yo.Base.apply(this, arguments);
+module.exports = class SystemGenerator extends Generator {
+  constructor(args, opts) {
+    super(args, opts)
 
     this.option("name", {
       desc: "System name. Expects kebab case.",
       type: String,
     });
 
-    this.option("filters", {
-      desc: "Comma seperated list of filters. Expects camel case.",
+    this.option("parent", {
+      desc: "Parent Entity name. Expects camel case.",
       type: String,
+      default: "",
     });
-  },
-  templates: function() {
-    if (!_.isString(this.options.name) || _.isEmpty(this.options.name)) {
-      throw new Error("System name is required");
-    } else {
-      var context = {
-        name: {
-          kebab: _.kebabCase(this.options.name),
-          constant: _.upperFirst(_.camelCase(this.options.name)),
-        },
-        filters: _.chain(this.options.filters || "")
-          .split(",")
-          .filter((e) => !_.isEmpty(e.trim()))
-          .map(function(e) {
-            return "\"" + e.trim() + "\"";
-          }).value().join(", "),
-      };
-    }
 
-    this.template("_system.ts", "src/systems/" + context.name.kebab + "-system.ts", context);
-  },
-});
+    this.option("components", {
+      desc: "Comma seperated list of components. Expects camel case.",
+      type: String,
+      default: "",
+    });
+
+    this.option("events", {
+      desc: "Comma seperated list of events. Expects kebab case.",
+      type: String,
+      default: "",
+    });
+  }
+
+  templates() {
+    var name = util.nameFor(this.options.name);
+    var parent = util.parentFor(this.options.parent);
+    while (parent.imports.length > 1) {
+      parent.imports.pop();
+    }
+    var components = util.componentsFor(this.options.components);
+    for (let e of components) {
+      while (e.imports.length > 1) {
+        e.imports.pop();
+      }
+    }
+    var events = util.eventsFor(this.options.events);
+    for (let e of events) {
+      while (e.imports.length > 1) {
+        e.imports.shift();
+      }
+    }
+    var imports = util.importsFor(components.concat(events).concat([ parent ]));
+
+    this.fs.copyTpl(
+      this.templatePath("_system.ts"),
+      this.destinationPath("src/systems/" + name.kebab + "-system.ts"),
+      { parent: parent,
+        name: name,
+        components: components,
+        events: events,
+        imports: imports,
+      });
+  }
+}
