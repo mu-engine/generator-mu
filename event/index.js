@@ -1,5 +1,5 @@
-var Generator = require("yeoman-generator");
-var util = require("../util");
+const Generator = require("yeoman-generator");
+const util = require("../util");
 
 module.exports = class ComponentGenerator extends Generator {
   constructor(args, opts) {
@@ -24,11 +24,11 @@ module.exports = class ComponentGenerator extends Generator {
   }
 
   templates() {
-    var name = util.nameFor(this.options.name);
-    var types = util.typesFor(this.options.types);
-    var fields = util.fieldsFor(this.options.fields);
+    const name = util.nameFor(this.options.name);
+    const types = util.typesFor(this.options.types);
+    const fields = util.fieldsFor(this.options.fields);
 
-    var imports = util.importsFor(fields);
+    const imports = util.importsFor(fields);
 
     if (types.length === 0) {
       types.push(name.kebab);

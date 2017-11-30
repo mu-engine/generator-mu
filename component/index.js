@@ -1,5 +1,5 @@
-var Generator = require("yeoman-generator");
-var util = require("../util");
+const Generator = require("yeoman-generator");
+const util = require("../util");
 
 module.exports = class ComponentGenerator extends Generator {
   constructor(args, opts) {
@@ -18,9 +18,9 @@ module.exports = class ComponentGenerator extends Generator {
   }
 
   templates() {
-    var name = util.nameFor(this.options.name);
-    var fields = util.fieldsFor(this.options.fields);
-    var imports = util.importsFor(fields);
+    const name = util.nameFor(this.options.name);
+    const fields = util.fieldsFor(this.options.fields);
+    const imports = util.importsFor(fields);
 
     this.fs.copyTpl(
       this.templatePath("_component.ts"),

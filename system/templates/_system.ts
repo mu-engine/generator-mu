@@ -1,31 +1,31 @@
-<% for (i in imports) { -%>
-<% if (imports[i].list.length > 1) { -%>
+<% for (let e of imports) { -%>
+<% if (e.list.length > 1) { -%>
 import {
-<% for (j in imports[i].list) { -%>
-  <%= imports[i].list[j] %>
+<% for (let f of e.list) { -%>
+  <%= f %>
 <% } -%>
-} from "<%= imports[i].name %>";
+} from "<%= e.name %>";
 
 <% } else { -%>
-import { <%= imports[i].list[0] %> } from "<%= imports[i].name %>";
+import { <%= e.list[0] %> } from "<%= e.name %>";
 
 <% } -%>
 <% } -%>
 export interface <%= name.constant %>SystemEntity extends <%= parent.type %>Entity {
-<% for (i in components) { -%>
-  <%= components[i].key %>: <%- components[i].type %>Data,
+<% for (let e of components) { -%>
+  <%= e.key %>: <%- e.type %>Data,
 <% } -%>
 }
 
 export function <%= name.constant %>System(entity: <%= name.constant %>SystemEntity): void {
-<% for (i in events) { -%>
-<% if (events[i].type !== "") { -%>
+<% for (let e of events) { -%>
+<% if (e.type !== "") { -%>
 
-  entity.on("<%= events[i].key %>", (ev: <%= events[i].type %>EventData) => {
+  entity.on("<%= e.key %>", (ev: <%= e.type %>EventData) => {
   });
 <% } else { -%>
 
-  entity.on("<%= events[i].key %>", () => {
+  entity.on("<%= e.key %>", () => {
   });
 <% } -%>
 <% } -%>

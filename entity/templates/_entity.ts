@@ -1,36 +1,36 @@
-<% for (i in imports) { -%>
-<% if (imports[i].list.length > 1) { -%>
+<% for (let e of imports) { -%>
+<% if (e.list.length > 1) { -%>
 import {
-<% for (j in imports[i].list) { -%>
-  <%= imports[i].list[j] %>
+<% for (f of e.list) { -%>
+  <%= f %>
 <% } -%>
-} from "<%= imports[i].name %>";
+} from "<%= e.name %>";
 
 <% } else { -%>
-import { <%= imports[i].list[0] %> } from "<%= imports[i].name %>";
+import { <%= e.list[0] %> } from "<%= e.name %>";
 
 <% } -%>
 <% } -%>
 export interface <%= name.constant %>EntityConfig extends <%= parent.type %>EntityConfig {
-<% for (i in components) { -%>
-  <%= components[i].key %>: Partial<<%= components[i].type %>Data>;
+<% for (let e of components) { -%>
+  <%= e.key %>: Partial<<%= e.type %>Data>;
 <% } -%>
 }
 
 export class <%= name.constant %>Entity extends <%= parent.type %>Entity {
-<% for (i in components) { -%>
-  <%= components[i].key %>: <%= components[i].type %>Data;
+<% for (let e of components) { -%>
+  <%= e.key %>: <%= e.type %>Data;
 <% } -%>
 
   constructor(config?: Partial<<%= name.constant %>EntityConfig>) {
     super(config);
-<% for (i in components) { -%>
+<% for (let e of components) { -%>
 
-    this.<%= components[i].key %> = <%= components[i].type %>Component({});
+    this.<%= e.key %> = <%= e.type %>Component({});
 <% } -%>
-<% for (i in systems) { -%>
+<% for (let e in systems) { -%>
 
-    <%= systems[i].type %>System(this);
+    <%= e.type %>System(this);
 <% } -%>
   }
 }

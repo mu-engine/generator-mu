@@ -1,32 +1,32 @@
-<% for (i in imports) { -%>
-<% if (imports[i].list.length > 1) { -%>
+<% for (let e of imports) { -%>
+<% if (e.list.length > 1) { -%>
 import {
-<% for (j in imports[i].list) { -%>
-  <%= imports[i].list[j] %>
+<% for (let j of e.list) { -%>
+  <%= j %>
 <% } -%>
-} from "<%= imports[i].name %>";
+} from "<%= e.name %>";
 
 <% } else { -%>
-import { <%= imports[i].list[0] %> } from "<%= imports[i].name %>";
+import { <%= e.list[0] %> } from "<%= e.name %>";
 
 <% } -%>
 <% } -%>
 export interface <%= name.constant %>Data {
-<% for (i in fields) { -%>
-  <%= fields[i].key %>: <%- fields[i].type %>,
+<% for (let e of fields) { -%>
+  <%= e.key %>: <%- e.type %>,
 <% } -%>
 }
 
 export class <%= name.constant %>Component implements <%= name.constant %>Data {
-<% for (i in fields) { -%>
-  <%= fields[i].key %>: <%- fields[i].type %>,
+<% for (let e of fields) { -%>
+  <%= e.key %>: <%- e.type %>,
 <% } -%>
 
   constructor(options?: Partial<<%= name.constant %>Data>) {
     Object.assign(this, {
-<% for (i in fields) { -%>
-<% if (fields[i].defaults !== "") { -%>
-      <%= fields[i].key %>: <%- fields[i].defaults %>,
+<% for (let e of fields) { -%>
+<% if (e.defaults !== "") { -%>
+      <%= e.key %>: <%- e.defaults %>,
 <% } -%>
 <% } -%>
     });

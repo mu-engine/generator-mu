@@ -1,4 +1,4 @@
-var _ = require("lodash");
+const _ = require("lodash");
 
 exports.nameFor = function(s) {
   if (!_.isString(s) || _.isEmpty(s.trim())) {
@@ -13,7 +13,7 @@ exports.nameFor = function(s) {
 
 // key[:type[@module]][=value]
 exports.splitField = function(s) {
-  var pair = s.split("=", 2);
+  const pair = s.split("=", 2);
 
   if (pair.length > 1) {
     return exports.splitComponent(pair[0]).concat([ pair[1] ]);
@@ -24,7 +24,7 @@ exports.splitField = function(s) {
 
 // key[:type[@module]]
 exports.splitComponent = function(s) {
-  var pair = s.split(":", 2);
+  const pair = s.split(":", 2);
 
   return [ _.camelCase(pair[0]) ].concat(exports.splitTypeinfo(pair[1]));
 }
@@ -32,8 +32,8 @@ exports.splitComponent = function(s) {
 // type[@module]
 exports.splitTypeinfo = function(s) {
   if (s !== undefined) {
-    var pair = s.split("@", 2);
-    var type = _.upperFirst(_.camelCase(pair[0].trim()));
+    const pair = s.split("@", 2);
+    const type = _.upperFirst(_.camelCase(pair[0].trim()));
 
     if (pair.length > 1) {
       return [ type, pair[1].trim() ];
@@ -50,9 +50,9 @@ exports.splitTypeinfo = function(s) {
 exports.fieldsFor = function(s) {
   return _.chain(s)
     .split(",")
-    .filter(function(e) { return !_.isEmpty(e.trim()); })
-    .map(function(e) {
-      var field = exports.splitField(e);
+    .filter((e) => !_.isEmpty(e.trim()))
+    .map((e) => {
+      const field = exports.splitField(e);
 
       return {
         key: field[0],
@@ -67,9 +67,9 @@ exports.fieldsFor = function(s) {
 exports.eventsFor = function(s) {
   return _.chain(s)
     .split(",")
-    .filter(function(e) { return !_.isEmpty(e.trim()); })
-    .map(function(e) {
-      var component = exports.splitComponent(e);
+    .filter((e) => !_.isEmpty(e.trim()))
+    .map((e) => {
+      const component = exports.splitComponent(e);
 
       return {
         key: _.kebabCase(component[0]),
@@ -85,9 +85,9 @@ exports.eventsFor = function(s) {
 exports.componentsFor = function(s) {
   return _.chain(s)
     .split(",")
-    .filter(function(e) { return !_.isEmpty(e.trim()); })
-    .map(function(e) {
-      var typeinfo = exports.splitTypeinfo(e);
+    .filter((e) => !_.isEmpty(e.trim()))
+    .map((e) => {
+      const typeinfo = exports.splitTypeinfo(e);
 
       return {
         key: _.kebabCase(typeinfo[0]),
@@ -103,9 +103,9 @@ exports.componentsFor = function(s) {
 exports.systemsFor = function(s) {
   return _.chain(s)
     .split(",")
-    .filter(function(e) { return !_.isEmpty(e.trim()); })
-    .map(function(e) {
-      var typeinfo = exports.splitTypeinfo(e);
+    .filter((e) => !_.isEmpty(e.trim()))
+    .map((e) => {
+      const typeinfo = exports.splitTypeinfo(e);
 
       return {
         type: typeinfo[0],
@@ -120,10 +120,9 @@ exports.systemsFor = function(s) {
 exports.typesFor = function(s) {
   return _.chain(s)
     .split(",")
-    .filter(function(e) { return !_.isEmpty(e.trim()); })
-    .map(function(e) {
-      return _.kebabCase(e);
-    }).value();
+    .filter((e) => !_.isEmpty(e.trim()))
+    .map((e) => _.kebabCase(e))
+    .value();
 }
 
 exports.parentFor = function(s) {
@@ -134,7 +133,7 @@ exports.parentFor = function(s) {
       imports: [ "Entity" ],
     };
   } else {
-    var typeinfo = exports.splitTypeinfo(s);
+    const typeinfo = exports.splitTypeinfo(s);
 
     return {
       type: typeinfo[0],
@@ -149,13 +148,12 @@ exports.parentFor = function(s) {
 exports.importsFor = function(a) {
   return _.chain(a)
     .groupBy("module")
-    .map(function(v,k) {
+    .map((v,k) => {
       return {
         name: k,
         list: _.uniq(_.flatten(_.map(v, "imports"))),
       };
-    }).filter(function(e) {
-      return !_.isEmpty(e.name.trim());
-    }).value();
+    }).filter((e) => !_.isEmpty(e.name.trim()))
+    .value();
 }
 

@@ -1,5 +1,5 @@
-var Generator = require("yeoman-generator");
-var util = require("../util");
+const Generator = require("yeoman-generator");
+const util = require("../util");
 
 module.exports = class EntityGenerator extends Generator {
   constructor(args, opts) {
@@ -30,11 +30,11 @@ module.exports = class EntityGenerator extends Generator {
   }
 
   templates() {
-    var name = util.nameFor(this.options.name);
-    var parent = util.parentFor(this.options.parent);
-    var components = util.componentsFor(this.options.components);
-    var systems = util.systemsFor(this.options.systems);
-    var imports = util.importsFor(components.concat(systems).concat([ parent ]));
+    const name = util.nameFor(this.options.name);
+    const parent = util.parentFor(this.options.parent);
+    const components = util.componentsFor(this.options.components);
+    const systems = util.systemsFor(this.options.systems);
+    const imports = util.importsFor(components.concat(systems).concat([ parent ]));
 
     this.fs.copyTpl(
       this.templatePath("_entity.ts"),
