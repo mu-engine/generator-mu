@@ -38,7 +38,7 @@ exports.splitTypeinfo = function(s) {
     if (pair.length > 1) {
       return [ type, pair[1].trim() ];
     } else if ([ "string", "number", "boolean", "date" ].includes(pair[0].trim())) {
-      return [ type, "" ];
+      return [ pair[0].trim(), "" ];
     } else {
       return [ type, "mu-engine" ];
     }
@@ -114,6 +114,15 @@ exports.systemsFor = function(s) {
                 typeinfo[1]),
         imports: [ (typeinfo[0] + "System") ],
       };
+    }).value();
+}
+
+exports.typesFor = function(s) {
+  return _.chain(s)
+    .split(",")
+    .filter(function(e) { return !_.isEmpty(e.trim()); })
+    .map(function(e) {
+      return _.kebabCase(e);
     }).value();
 }
 
