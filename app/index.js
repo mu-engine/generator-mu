@@ -1,15 +1,16 @@
-var path = require("path");
-var _ = require("lodash");
-var yo = require("yeoman-generator");
+const path = require("path");
 
-module.exports = yo.Base.extend({
-  constructor: function() {
-    yo.Base.apply(this, arguments);
+const Generator = require("yeoman-generator");
+const util = require("../util");
+
+module.exports = class AppGenerator extends Generator {
+  constructor(args, opts) {
+    super(args, opts);
 
     this.option("name", {
       desc: "Application name. Expects kebab case.",
       type: String,
-      defaults: _.last(process.cwd().split(path.sep)),
+      defaults: path.basename(process.cwd()),
     });
 
     this.option("description", {
@@ -17,88 +18,98 @@ module.exports = yo.Base.extend({
       type: String,
       defaults: "A generated Mu Engine game.",
     });
+  }
 
-  },
-  packageFile: function() {
-    var done = this.async();
+  packageFile() {
+    const done = this.async();
 
-    this.user.github.username(function(err, username) {
-      if (err) {
-        done(err);
-      } else {
-        this.fs.writeJSON("package.json", {
-          name: this.options.name,
-          version: "0.1.0",
-          description: this.options.description,
-          main: "index.js",
-          scripts: {
-            start: "node index.js"
-          },
-          repository: {
-            type: "git",
-            url: "git+https://github.com/" + username + "/" + this.options.name + ".git"
-          },
-          keywords: [
-            "mu-engine"
-          ],
-          author: this.user.git.name(),
-          license: "MIT",
-          bugs: {
-            url: "https://github.com/" + username + "/" + this.options.name + "/issues"
-          },
-          homepage: "https://github.com/" + username + "/" + this.options.name + "#readme",
-        }, null, 2);
+    this.user.github.username().then((username) => {
+      this.fs.writeJSON("package.json", {
+        name: this.options.name,
+        version: "0.1.0",
+        description: this.options.description,
+        scripts: {
+          start: "webpack-dev-server"
+        },
+        repository: {
+          type: "git",
+          url: "git+https://github.com/" + username + "/" + this.options.name + ".git"
+        },
+        keywords: [
+          "mu-engine"
+        ],
+        author: this.user.git.name(),
+        bugs: {
+          url: "https://github.com/" + username + "/" + this.options.name + "/issues"
+        },
+        homepage: "https://github.com/" + username + "/" + this.options.name + "#readme",
+        license: "UNLICENSED",
+      }, null, 2);
 
-        done();
-      }
-    }.bind(this));
-  },
-  templates: function() {
-    var context = {
-      name: {
-        kebab: _.kebabCase(this.options.name),
-        constant: _.upperFirst(_.camelCase(this.options.name)),
-      },
+      done();
+    }).catch((error) => {
+      done(err);
+    });
+  }
+
+  templates() {
+    const context = {
+      name: util.nameFor(this.options.name),
       description: this.options.description,
     };
 
-    this.template("_gitignore", ".gitignore", context);
-    this.template("_README.md", "README.md", context);
-    this.template("_tslint.json", "tslint.json", context);
-    this.template("_tsconfig.json", "tsconfig.json", context);
-    this.template("_webpack.config.js", "webpack.config.js", context);
-    this.template("_index.js", "index.js", context);
-    this.template("_index.ts", "src/index.ts", context);
-    this.template("_index.html", "src/index.html", context);
-    this.template("_index.scss", "src/index.scss", context);
-    this.template("_game.ts", "src/" + context.name.kebab + ".ts", context);
-  },
-  dependencies: function() {
-    this.on("end", () => {
-      this.spawnCommandSync("yarn",[
-        "add",
-        "immutable",
-        "mu-engine",
-      ]);
+    this.fs.copyTpl(this.templatePath("_gitignore"),
+                    this.destinationPath(".gitignore"),
+                    context);
+    this.fs.copyTpl(this.templatePath("_README.md"),
+                    this.destinationPath("README.md"),
+                    context);
+    this.fs.copyTpl(this.templatePath("_tsconfig.json"),
+                    this.destinationPath("tsconfig.json"),
+                    context);
+    this.fs.copyTpl(this.templatePath("_webpack.config.js"),
+                    this.destinationPath("webpack.config.js"),
+                    context);
+    this.fs.copyTpl(this.templatePath("_assets.config.json"),
+                    this.destinationPath("assets.config.json"),
+                    context);
+    this.fs.copyTpl(this.templatePath("_postcss.config.js"),
+                    this.destinationPath("postcss.config.js"),
+                    context);
+    this.fs.copyTpl(this.templatePath("src/_index.ts"),
+                    this.destinationPath("src/index.ts"),
+                    context);
+    this.fs.copyTpl(this.templatePath("src/_typings.d.ts"),
+                    this.destinationPath("src/typeings.d.ts"),
+                    context);
+    this.fs.copyTpl(this.templatePath("src/_index.html"),
+                    this.destinationPath("src/index.html"),
+                    context);
+    this.fs.copyTpl(this.templatePath("src/_index.scss"),
+                    this.destinationPath("src/index.scss"),
+                    context);
+  }
 
-      this.spawnCommandSync("yarn",[
-        "add",
-        "css-loader",
-        "express",
-        "extract-text-webpack-plugin",
-        "html-webpack-plugin",
-        "morgan",
-        "node-sass",
-        "sass-loader",
-        "serve-static",
-        "style-loader",
-        "ts-loader",
-        "tslint",
-        "tslint-loader",
-        "typescript",
-        "webpack",
-        "--dev",
-      ]);
-    });
-  },
-});
+  dependencies() {
+
+    this.yarnInstall([ "mu-engine" ]);
+    this.yarnInstall([
+      "autoprefixer",
+      "babel-core",
+      "babel-loader",
+      "babel-preset-env",
+      "css-loader",
+      "extract-text-webpack-plugin",
+      "html-webpack-plugin",
+      "mu-assets-loader",
+      "node-sass",
+      "postcss-loader",
+      "sass-loader",
+      "style-loader",
+      "ts-loader",
+      "typescript",
+      "webpack",
+      "webpack-dev-server",
+    ], { dev: true });
+  }
+};
