@@ -72,7 +72,7 @@ exports.eventsFor = function(s) {
       const component = exports.splitComponent(e);
 
       return {
-        key: _.kebabCase(component[0]),
+        key: _.camelCase(component[0]),
         type: (component[1] === "any" ? "" : component[1] ),
         module: (component[2] === "." ?
                 ("../events/" + _.kebabCase(component[1]) + "-event") :
@@ -90,7 +90,7 @@ exports.componentsFor = function(s) {
       const typeinfo = exports.splitTypeinfo(e);
 
       return {
-        key: _.kebabCase(typeinfo[0]),
+        key: _.camelCase(typeinfo[0]),
         type: typeinfo[0],
         module: (typeinfo[1] === "." ?
                 ("../components/" + _.kebabCase(typeinfo[0]) + "-component") :

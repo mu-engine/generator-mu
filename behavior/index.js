@@ -18,14 +18,14 @@ module.exports = class BehaviorGenerator extends Generator {
         module: "mu-engine",
         imports: [
           "Behavior",
-          "BehaviorStatus",
+          "BehaviorState",
           "BehaviorOptions",
         ],
       },
     ]);
 
     this.fs.copyTpl(
-      this.templatePath("_behavior.ts"),
+      this.templatePath("_behavior.ejs"),
       this.destinationPath("src/behaviors/" + name.kebab + "-behavior.ts"),
       { name: name,
         imports: imports,

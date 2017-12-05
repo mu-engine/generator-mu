@@ -1,0 +1,9 @@
+<%- include("../../templates/_imports") %>
+export class <%= name.constant %>Behavior implements Behavior {
+  reset(): void {
+  }
+
+  call(_options: BehaviorOptions): BehaviorState {
+    return "success";
+  }
+}

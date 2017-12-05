@@ -23,7 +23,7 @@ module.exports = class ComponentGenerator extends Generator {
     const imports = util.importsFor(fields);
 
     this.fs.copyTpl(
-      this.templatePath("_component.ts"),
+      this.templatePath("_component.ejs"),
       this.destinationPath("src/components/" + name.kebab + "-component.ts"),
       { name: name,
         fields: fields,
