@@ -34,10 +34,11 @@ module.exports = class EntityGenerator extends Generator {
     const parent = util.parentFor(this.options.parent);
     const components = util.componentsFor(this.options.components);
     const systems = util.systemsFor(this.options.systems);
+    console.log(systems);
     const imports = util.importsFor(components.concat(systems).concat([ parent ]));
 
     this.fs.copyTpl(
-      this.templatePath("_entity.ts"),
+      this.templatePath("_entity.ejs"),
       this.destinationPath("src/entities/" + name.kebab + "-entity.ts"),
       { parent: parent,
         name: name,

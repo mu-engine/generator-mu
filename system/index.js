@@ -50,7 +50,7 @@ module.exports = class SystemGenerator extends Generator {
     const imports = util.importsFor(components.concat(events).concat([ parent ]));
 
     this.fs.copyTpl(
-      this.templatePath("_system.ts"),
+      this.templatePath("_system.ejs"),
       this.destinationPath("src/systems/" + name.kebab + "-system.ts"),
       { parent: parent,
         name: name,

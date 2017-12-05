@@ -1,19 +1,7 @@
-<% for (let e of imports) { -%>
-<% if (e.list.length > 1) { -%>
-import {
-<% for (let f of e.list) { -%>
-  <%= f %>
-<% } -%>
-} from "<%= e.name %>";
-
-<% } else { -%>
-import { <%= e.list[0] %> } from "<%= e.name %>";
-
-<% } -%>
-<% } -%>
+<%- include("../../templates/_imports") %>
 export interface <%= name.constant %>SystemEntity extends <%= parent.type %>Entity {
 <% for (let e of components) { -%>
-  <%= e.key %>: <%- e.type %>Data,
+  <%= e.key %>: <%- e.type %>Data;
 <% } -%>
 }
 

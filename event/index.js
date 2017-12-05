@@ -35,7 +35,7 @@ module.exports = class ComponentGenerator extends Generator {
     }
 
     this.fs.copyTpl(
-      this.templatePath("_event.ts"),
+      this.templatePath("_event.ejs"),
       this.destinationPath("src/events/" + name.kebab + "-event.ts"),
       { name: name,
         types: types,
