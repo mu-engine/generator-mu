@@ -6,5 +6,6 @@
     "assets/stages/*.tmx",
     "src/entities/*.ts"
   ],
-  "exclude": [ "_*" ]
+  "exclude": [ "_*" ],
+  "imports": [ "./node_modules/mu-engine/assets.config.json" ]
 }

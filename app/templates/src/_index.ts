@@ -1,13 +1,18 @@
 import {
+  Assets,
   StackEntity,
   RenderMediatorSystem,
   IntervalSystem,
   InputSystem,
 } from "mu-engine";
 
-import assets from "mu-assets-loader!../assets.config.json";
+import assetsConfig from "mu-assets-loader!../assets.config.json";
 
 document.addEventListener("DOMContentLoaded", () => {
+  const assets = new Assets({
+    preload: true,
+    assets: assetsConfig,
+  });
   const canvas = document.getElementById("stage");
 
   if (canvas != null) {
