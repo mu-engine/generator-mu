@@ -23,13 +23,13 @@ export class <%= name.constant %>Event implements <%= name.constant %>Event {
 <% } -%>
 
   constructor(options?: Partial<<%= name.constant %>EventData>) {
-    Object.assign(this, {
-      type: "<%= types[0] %>",
+    this.type = "<%= types[0] %>";
 <% for (let e of fields) { -%>
 <% if (e.defaults !== "") { -%>
-      <%= e.key %>: <%= e.defaults %>,
+    this.<%= e.key %> = <%- e.defaults %>;
 <% } -%>
 <% } -%>
-    }, options);
+
+    Object.assign(this, options);
   }
 }

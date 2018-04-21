@@ -11,12 +11,12 @@ export class <%= name.constant %>Component implements <%= name.constant %>Data {
 <% } -%>
 
   constructor(options?: Partial<<%= name.constant %>Data>) {
-    Object.assign(this, {
 <% for (let e of fields) { -%>
 <% if (e.defaults !== "") { -%>
-      <%= e.key %>: <%- e.defaults %>,
+    this.<%= e.key %> = <%- e.defaults %>;
 <% } -%>
 <% } -%>
-    }, options);
+
+    Object.assign(this, options);
   }
 }
